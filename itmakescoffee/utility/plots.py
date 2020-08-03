@@ -75,7 +75,7 @@ def format_yaxis(ax1, ax2, rescale=True):
 def minmax(ax):
     try:
         vals = np.hstack([line.get_ydata() for line in ax.lines])
-        minmax_vals= [np.amin(vals), np.amax(vals)]
+        minmax_vals = [np.amin(vals), np.amax(vals)]
         if any([np.isnan(val) for val in minmax_vals]):
             raise ValueError
         return minmax_vals

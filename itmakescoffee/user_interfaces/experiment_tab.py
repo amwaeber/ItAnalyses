@@ -4,10 +4,10 @@ import os
 from PyQt5 import QtWidgets, QtGui, QtCore
 import pyqtgraph as pg
 
-import hardware.keithley as keithley
-import hardware.sensor as sensor
-from utility import serial_ports
-from utility.config import paths, ports
+import itmakescoffee.hardware.keithley as keithley
+import itmakescoffee.hardware.sensor as sensor
+from itmakescoffee.utility import serial_ports
+from itmakescoffee.utility.config import paths, ports
 
 
 pg.setConfigOption('background', 'w')

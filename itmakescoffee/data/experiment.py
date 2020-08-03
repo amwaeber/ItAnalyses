@@ -1,10 +1,10 @@
 import os
 
-from data.data_bundle import DataBundle
-from data.kickstart_trace import KickstartTrace
-from data.trace import Trace
-from utility import folders
-from utility.version import __version__
+from itmakescoffee.data.data_bundle import DataBundle
+from itmakescoffee.data.kickstart_trace import KickstartTrace
+from itmakescoffee.data.trace import Trace
+from itmakescoffee.utility import folders
+from itmakescoffee.utility.version import __version__
 
 
 class Experiment(DataBundle):

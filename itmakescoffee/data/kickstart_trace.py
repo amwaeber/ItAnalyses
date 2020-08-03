@@ -3,7 +3,7 @@ import time
 
 import pandas as pd
 
-from data.data import Data
+from itmakescoffee.data.data import Data
 
 
 class KickstartTrace(Data):

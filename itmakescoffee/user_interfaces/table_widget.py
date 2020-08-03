@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 
-from user_interfaces.analysis_tab import Analysis
-from user_interfaces.experiment_tab import Experiment
+from itmakescoffee.user_interfaces.analysis_tab import Analysis
+from itmakescoffee.user_interfaces.experiment_tab import Experiment
 
 
 class TableWidget(QtWidgets.QWidget):

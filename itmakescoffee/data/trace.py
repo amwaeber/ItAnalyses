@@ -1,6 +1,6 @@
 import pandas as pd
 
-from data.data import Data, average_keys
+from itmakescoffee.data.data import Data, average_keys
 
 
 class Trace(Data):

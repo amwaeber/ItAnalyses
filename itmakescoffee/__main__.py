@@ -2,7 +2,7 @@ import sys
 
 from PyQt5 import QtWidgets
 
-from user_interfaces.main_window import MainWindow
+from itmakescoffee.user_interfaces.main_window import MainWindow
 
 
 def main():

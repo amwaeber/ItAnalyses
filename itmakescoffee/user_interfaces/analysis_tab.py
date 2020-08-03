@@ -4,16 +4,16 @@ import os
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.Qt import Qt
 
-import utility.colors as colors
-import utility.plots as plots
-from utility.conversions import timestamp_to_datetime_hour, metric_prefix
-from data.group import Group
-from data.experiment import Experiment
-from utility.widgets import TreeWidgetItem, ItemSignal
-from user_interfaces.multi_dir_dialog import MultiDirDialog
-from utility.config import paths
-from utility.excel_export import save_to_xlsx
-from utility.folders import get_experiment_folders, get_group_file_paths
+from itmakescoffee.utility import plots
+from itmakescoffee.utility import colors
+from itmakescoffee.utility.conversions import timestamp_to_datetime_hour, metric_prefix
+from itmakescoffee.data.group import Group
+from itmakescoffee.data.experiment import Experiment
+from itmakescoffee.utility.widgets import TreeWidgetItem, ItemSignal
+from itmakescoffee.user_interfaces.multi_dir_dialog import MultiDirDialog
+from itmakescoffee.utility.config import paths
+from itmakescoffee.utility.excel_export import save_to_xlsx
+from itmakescoffee.utility.folders import get_experiment_folders, get_group_file_paths
 
 
 line_plot_dict = {'Time': 'Time (s)',
@@ -834,7 +834,7 @@ class Analysis(QtWidgets.QWidget):
                         if item[1] == 'y1':
                             axis.plot(x_values, y_values, lw=1, ls='--',
                                       color=colors.lighten_color(colors.colors[j % len(colors.colors)],
-                                                                   1 - 0.6 * i / sum(experiment.n_traces)),
+                                                                 1 - 0.6 * i / sum(experiment.n_traces)),
                                       label='Trace %d' % int(trace.name.split('_')[-1]))
                         elif item[1] == 'y2':
                             axis2.plot(x_values, y_values, lw=1, ls='--',

@@ -3,8 +3,8 @@ import os
 import pandas as pd
 import pickle
 
-from data.data import average_keys
-from utility.version import __version__
+from itmakescoffee.data.data import average_keys
+from itmakescoffee.utility.version import __version__
 
 
 efficiency_keys = ['Delta V_oc', 'Delta I_sc', 'Delta P_max', 'Delta Fill Factor', 'Delta T_avg', 'Delta I_1_avg',

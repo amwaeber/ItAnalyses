@@ -6,7 +6,7 @@ import struct
 import threading
 import time
 
-import utility.conversions as conversions
+from itmakescoffee import utility as conversions
 
 
 class SerialRead(QtCore.QObject):

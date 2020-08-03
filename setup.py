@@ -21,4 +21,4 @@ setup(name="ItMakesCoffee",
       version="2020.7.29",
       description="Lambda IV Measurement and Analysis Software",
       options={"build_exe": build_exe_options},
-      executables=[Executable("itmakescoffee.py", base=base)])
+      executables=[Executable("__main__.py", base=base)])

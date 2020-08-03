@@ -1,9 +1,9 @@
 import os
 from PyQt5 import QtWidgets, QtGui
 
-from user_interfaces.table_widget import TableWidget
-from utility import config
-from utility.version import __version__
+from itmakescoffee.user_interfaces.table_widget import TableWidget
+from itmakescoffee.utility import config
+from itmakescoffee.utility.version import __version__
 
 
 class MainWindow(QtWidgets.QMainWindow):

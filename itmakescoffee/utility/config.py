@@ -1,9 +1,9 @@
 import os
 from configparser import ConfigParser
 
-from utility.version import __version__
+from itmakescoffee.utility.version import __version__
 
-PROJECT_PATH = os.path.join(os.path.dirname(__file__), '..')
+PROJECT_PATH = os.path.join(os.path.dirname(__file__), '../itmakescoffee/..')
 
 global_confs = {}
 paths = {}

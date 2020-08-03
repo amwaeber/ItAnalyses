@@ -1,7 +1,7 @@
 import os
 from PyQt5 import QtGui, QtWidgets
 
-from utility.config import paths
+from itmakescoffee.utility.config import paths
 
 
 class MultiDirDialog(QtWidgets.QFileDialog):

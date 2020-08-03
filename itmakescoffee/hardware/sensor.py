@@ -3,7 +3,7 @@ import pyqtgraph as pg
 import threading
 import time
 
-from hardware.arduino_ai import SerialRead
+from itmakescoffee.hardware.arduino_ai import SerialRead
 
 
 class ArduinoSensor(QtCore.QObject):
