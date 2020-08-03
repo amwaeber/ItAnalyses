@@ -1,7 +1,7 @@
 import os
 from configparser import ConfigParser
 
-from utility._version import __version__
+from utility.version import __version__
 
 PROJECT_PATH = os.path.join(os.path.dirname(__file__), '..')
 

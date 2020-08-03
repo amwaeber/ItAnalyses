@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets, QtGui
 
 from user_interfaces.table_widget import TableWidget
 from utility import config
+from utility.version import __version__
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -14,7 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def init_ui(self):
         self.setWindowIcon(QtGui.QIcon(os.path.join(config.paths['icons'], 'coffee.png')))
-        self.setWindowTitle("%s %s" % (config.global_confs['progname'], config.global_confs['progversion']))
+        self.setWindowTitle("%s %s" % (config.global_confs['progname'], __version__))
 
         self.table_widget = TableWidget(self)  # create multiple document interface widget
         self.setCentralWidget(self.table_widget)

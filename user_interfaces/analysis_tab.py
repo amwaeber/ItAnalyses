@@ -7,7 +7,8 @@ from PyQt5.Qt import Qt
 import utility.colors as colors
 import utility.plots as plots
 from utility.conversions import timestamp_to_datetime_hour, metric_prefix
-from utility.data_import import Experiment, Group
+from data.group import Group
+from data.experiment import Experiment
 from utility.widgets import TreeWidgetItem, ItemSignal
 from user_interfaces.multi_dir_dialog import MultiDirDialog
 from utility.config import paths
