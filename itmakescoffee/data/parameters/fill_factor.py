@@ -1,6 +1,3 @@
-import numpy as np
-from scipy import optimize
-
 from itmakescoffee.data.parameters.parameter import Parameter
 
 

@@ -18,6 +18,7 @@ class Power(Parameter):
             if any(current.raw_data[i] > 0):
                 try:
                     self.value[i] = [ds.loc[current.raw_data[i] > 0].max(), 0]
+                    self.idx[i] = ds.index[ds == self.value[i][0]][0]
                 except IndexError:
                     self.value[i] = [0, 0]
             else:
@@ -25,9 +26,10 @@ class Power(Parameter):
 
     def set_fit(self, n_points=10, voltage=None, current=None, i00=5e-5, vt0=7.5e-2, rsh0=150):
         for i, ds in enumerate(self.raw_data):
-            pmax_idx = ds.index[ds == self.value[i][0]]
-            voltage_df = voltage.raw_data[i].iloc[pmax_idx[0] - n_points:pmax_idx[0] + n_points]
-            current_df = current.raw_data[i].iloc[pmax_idx[0] - n_points:pmax_idx[0] + n_points]
+            self.idx_range[i] = [self.idx[i] - n_points, self.idx[i] + n_points]
+
+            voltage_df = voltage.raw_data[i][self.idx_range[i][0]:self.idx_range[i][1]]
+            current_df = current.raw_data[i][self.idx_range[i][0]:self.idx_range[i][1]]
 
             popt, pcov = optimize.curve_fit(self.shockley, voltage_df, current_df,
                                             p0=np.array([current.raw_data[i].iloc[0], i00, vt0, rsh0]))

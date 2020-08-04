@@ -20,6 +20,10 @@ class Parameter:
         self.avg_value = [0, 0]
         self.avg_fit = [0, 0]
 
+        self.idx_range = [[self.raw_data[i].first_valid_index(), self.raw_data[i].last_valid_index()]
+                          for i in range(self.n_frames)]
+        self.idx = [i[0] for i in self.idx_range]
+
     def set_value(self, *args, **kwarg):
         self.value = [[0, 0]] * len(self.raw_data)
 
@@ -31,11 +35,11 @@ class Parameter:
             include = [False]
         if any(include):
             self.avg_value = [np.mean([val[0] for i, val in enumerate(self.value) if include[i]]),
-                               np.std([val[0] for i, val in enumerate(self.value) if include[i]])]
+                              np.std([val[0] for i, val in enumerate(self.value) if include[i]])]
         else:
             self.avg_value = [0, 0]
 
-    def set_avg_fit(self, include=None, *args, **kwarg):
+    def set_avg_fit(self, include=None):
         if include is None:
             include = [False]
         if any(include):
