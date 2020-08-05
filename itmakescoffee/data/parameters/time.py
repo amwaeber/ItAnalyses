@@ -32,4 +32,3 @@ class Time(Parameter):
         for i in range(self.n_frames):
             self.raw_data[i] = self.raw_data[i] - self.raw_data[i].iloc[0]
         self.avg_data = list() if self.n_frames == 0 else pd.concat(self.raw_data).groupby(level=0).mean()
-

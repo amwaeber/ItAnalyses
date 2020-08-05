@@ -13,8 +13,8 @@ class Parameter:
         self.n_frames = 0 if data_frames is None else len(data_frames)
 
         self.raw_data = list() if self.n_frames == 0 else data_frames
-        self.value = [[0, 0]] * len(self.raw_data)
-        self.fit = [[0, 0]] * len(self.raw_data)
+        self.value = [[0, 0]] * self.n_frames
+        self.fit = [[0, 0]] * self.n_frames
 
         self.avg_data = list() if self.n_frames == 0 else pd.concat(self.raw_data).groupby(level=0).mean()
         self.avg_value = [0, 0]
@@ -25,10 +25,10 @@ class Parameter:
         self.idx = [i[0] for i in self.idx_range]
 
     def set_value(self, *args, **kwarg):
-        self.value = [[0, 0]] * len(self.raw_data)
+        self.value = [[0, 0]] * self.n_frames
 
     def set_fit(self, *args, **kwarg):
-        self.fit = [[0, 0]] * len(self.raw_data)
+        self.fit = [[0, 0]] * self.n_frames
 
     def set_avg_value(self, include=None):
         if include is None:
