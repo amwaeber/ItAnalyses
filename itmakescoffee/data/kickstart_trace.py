@@ -15,10 +15,11 @@ class KickstartTrace(Data):
         self.data = pd.read_csv(self.data_path, sep=',', header=0, index_col=0, skiprows=33,
                                 names=["Time (s)", "Voltage (V)", "Current (A)"])
         self.time = time.mktime(time.strptime(os.path.basename(self.data_path).split(' ')[-1], "%Y-%m-%dT%H.%M.%S.csv"))
+        self.data.index.name = 'Index'
         self.data['Time (s)'] = self.data['Time (s)'] + self.time
         self.data['Current (A)'] = - self.data['Current (A)']
         self.data['Power (W)'] = self.data['Voltage (V)'] * self.data['Current (A)']
-        for item in ['Index', "Temperature (C)", "Irradiance 1 (W/m2)", "Irradiance 2 (W/m2)", "Irradiance 3 (W/m2)",
+        for item in ["Temperature (C)", "Irradiance 1 (W/m2)", "Irradiance 2 (W/m2)", "Irradiance 3 (W/m2)",
                      "Irradiance 4 (W/m2)"]:
             self.data[item] = -1
         self.values['Open Circuit Voltage V_oc (V)'] = [self.get_voc(), 0]
