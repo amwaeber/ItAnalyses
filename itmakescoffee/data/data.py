@@ -44,7 +44,7 @@ class Data:
         self.data[column].replace([0, -1], np.nan, inplace=True)
         self.data[column].fillna(method='backfill', inplace=True)
         self.data[column].fillna(method='pad', inplace=True)
-        self.data[column].fillna(value=-1, inplace=True)
+        self.data[column].fillna(value=0, inplace=True)
 
     def get_voc(self):
         try:

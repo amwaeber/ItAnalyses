@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import time
 
+from itmakescoffee.data.parameters.info import Info
 from itmakescoffee.data.parameters.current import Current
 from itmakescoffee.data.parameters.voltage import Voltage
 from itmakescoffee.data.parameters.power import Power
@@ -12,11 +13,12 @@ from itmakescoffee.data.parameters.irradiance import Irradiance
 from itmakescoffee.data.parameters.parameter_group import ParameterGroup
 
 
-class Dataset:
+class DataSet:
     def __init__(self, name='Dataset', csv_files=None, *args, **kwargs):
         self.name = name
 
         self.file_paths = list() if csv_files is None else csv_files
+        self.info = Info(setting_files=[file[:-4] + '.dat' for file in self.file_paths])
         self.data = self.load_data()
 
         # Initialise parameters
@@ -42,14 +44,9 @@ class Dataset:
         data = list()
         for path in self.file_paths:
             if os.path.basename(path).startswith('IV_Curve_'):  # ItMakesCoffee data
-                data.append(pd.read_csv(path, header=None, index_col=0, skiprows=3,
-                                        names=["Index", "Time (s)", "Voltage (V)", "Current (A)", "Current Std (A)",
-                                               "Resistance (Ohm)", "Power (W)", "Temperature (C)",
-                                               "Irradiance 1 (W/m2)", "Irradiance 2 (W/m2)", "Irradiance 3 (W/m2)",
-                                               "Irradiance 4 (W/m2)"],
-                                        usecols=[0, 1, 2, 3, 6, 7, 8, 9, 10, 11]))
-            else:
-                data.append(self.load_kickstart_data(path))  # Kickstart data
+                data.append(pd.read_csv(path, header=0, index_col=0))
+            # else:
+            #     data.append(self.load_kickstart_data(path))  # Kickstart data
         return data
 
     @staticmethod

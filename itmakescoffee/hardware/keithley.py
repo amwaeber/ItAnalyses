@@ -38,7 +38,6 @@ class Keithley(QtCore.QObject):
         self.powers = np.zeros_like(self.voltages_set)
 
         self.is_run = True
-        # self.is_receiving = False
         self.gpib_thread = None
         self.sourcemeter = None
 
@@ -65,21 +64,15 @@ class Keithley(QtCore.QObject):
 
     def read_keithley_start(self):
         self.is_run = True
-        # self.is_receiving = False
         if self.gpib_thread is None:
             self.gpib_thread = threading.Thread(target=self.background_thread)
             self.gpib_thread.start()
-            # # Block till we start receiving values
-            # while not self.is_receiving:
-            #     time.sleep(0.1)
 
     def get_keithley_data(self):
         data = pd.DataFrame({
             'Time (s)': self.times,
             'Voltage (V)': self.voltages,
             'Current (A)': self.currents,
-            'Current Std (A)': self.currents_std,
-            'Resistance (Ohm)': self.resistances,
             'Power (W)': self.powers})
         return data
 
@@ -100,7 +93,6 @@ class Keithley(QtCore.QObject):
                         time.sleep(self.delay)
                         self.times[dp] = time.time()
                         self.update.emit(dp)
-                        # self.is_receiving = True
                 else:
                     for dp in range(self.n_data_points):
                         if not self.is_run:
@@ -114,11 +106,8 @@ class Keithley(QtCore.QObject):
                         self.times[dp] = time.time()
                         self.voltages[dp] = self.sourcemeter.mean_voltage
                         self.currents[dp] = - self.sourcemeter.mean_current
-                        self.currents_std[dp] = self.sourcemeter.std_current
-                        self.resistances[dp] = abs(self.voltages[dp] / self.currents[dp])
                         self.powers[dp] = abs(self.voltages[dp] * self.currents[dp])
                         self.update.emit(dp)
-                        # self.is_receiving = True
                     self.sourcemeter.source_voltage = 0
                 self.save.emit(repetition)
                 self.to_log.emit('<span style=\" color:#1e90ff;\" >Finished curve #%s</span>' % str(repetition + 1))
