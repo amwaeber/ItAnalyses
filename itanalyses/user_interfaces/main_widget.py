@@ -10,6 +10,7 @@ from itanalyses.utility.conversions import timestamp_to_datetime_hour, metric_pr
 from itanalyses.data.group import Group
 from itanalyses.data.experiment import Experiment
 from itanalyses.utility.widgets import TreeWidgetItem, ItemSignal
+from itanalyses.user_interfaces.index_widget import IndexWidget
 from itanalyses.user_interfaces.multi_dir_dialog import MultiDirDialog
 from itanalyses.utility.config import paths
 from itanalyses.utility.excel_export import save_to_xlsx
@@ -467,7 +468,12 @@ class MainWidget(QtWidgets.QWidget):
         self.update_plot()
 
     def show_index(self):
-        pass
+        index_dialog = IndexWidget(self)
+        if index_dialog.exec_():
+            self.experiment_paths = index_dialog.selected
+            print(self.experiment_paths)
+        else:
+            pass
 
     def folder_dialog(self):
         self.plot_directory = str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Directory',

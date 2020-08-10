@@ -4,10 +4,14 @@ from itanalyses.data.parameters.info import Info
 
 
 class DataIndex:
-    def __init__(self, folder=None):
-        self.folder = folder
-        self.files = self.file_names(self.folder)
-        self.info = Info(setting_files=self.files)
+    def __init__(self, folder=None, index_file=None):
+        if index_file:
+            self.folder = os.path.dirname(index_file)
+            self.load(index_file=index_file)
+        else:
+            self.folder = folder if folder is not None else '.'
+            self.files = self.file_names(self.folder)
+            self.info = Info(setting_files=self.files)
 
     def file_names(self, path):
         files = list()
@@ -21,3 +25,9 @@ class DataIndex:
             if os.path.isdir(new_path):
                 files += self.file_names(new_path)
         return files
+
+    def load(self, index_file=None):
+        pass
+
+    def save(self, index_file=None):
+        pass
