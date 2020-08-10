@@ -48,11 +48,11 @@ efficiency_plot_dict = {'Current': ['Delta I_sc', r'$\Delta I_{sc}/PV (\%)$'],
                         'Irradiance 4': ['Delta I_4_avg', r'$\Delta I_{4, avg}/PV (\%)$']}
 
 
-class Analysis(QtWidgets.QWidget):
+class MainWidget(QtWidgets.QWidget):
     update_plt = QtCore.pyqtSignal()  # figure signal lane
 
     def __init__(self, parent=None):
-        super(Analysis, self).__init__(parent)
+        super(MainWidget, self).__init__(parent)
 
         self.experiment_paths = list()
         self.experiment_dict = {}
@@ -73,6 +73,12 @@ class Analysis(QtWidgets.QWidget):
         self.export_directory = paths['last_export']
 
         hbox_total = QtWidgets.QHBoxLayout()
+        self.toolbar = QtWidgets.QToolBar("Analysis")
+        index_button = QtWidgets.QAction(QtGui.QIcon(os.path.join(paths['icons'], 'index.png')), 'Index', self)
+        index_button.triggered.connect(self.show_index)
+        self.toolbar.addAction(index_button)
+        hbox_total.addWidget(self.toolbar)
+
         vbox_left = QtWidgets.QVBoxLayout()
         self.plot_group_box = QtWidgets.QGroupBox('Graphs')
         vbox_plot = QtWidgets.QVBoxLayout()
@@ -459,6 +465,9 @@ class Analysis(QtWidgets.QWidget):
         self.setLayout(hbox_total)
 
         self.update_plot()
+
+    def show_index(self):
+        pass
 
     def folder_dialog(self):
         self.plot_directory = str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Directory',

@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 
-from itanalyses.user_interfaces.analysis_tab import Analysis
+from itanalyses.user_interfaces.main_widget import MainWidget
 
 
 class TableWidget(QtWidgets.QWidget):
@@ -13,7 +13,7 @@ class TableWidget(QtWidgets.QWidget):
         # Initialize tab screen
         self.tabs = QtWidgets.QTabWidget()
 
-        self.tab_analysis = Analysis(self)
+        self.tab_analysis = MainWidget(self)
         self.tabs.addTab(self.tab_analysis, "Analysis")
 
         # Add tabs to widget

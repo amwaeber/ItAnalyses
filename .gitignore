@@ -7,5 +7,7 @@
 *.iml
 out
 gen
-!/itanalyses/config.ini
 /venv/
+
+# Config file
+/itanalyses/config.ini
