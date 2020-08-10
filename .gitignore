@@ -7,5 +7,5 @@
 *.iml
 out
 gen
-!/itmakescoffee/config.ini
+!/itanalyses/config.ini
 /venv/

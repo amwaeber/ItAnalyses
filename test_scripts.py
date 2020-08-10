@@ -1,7 +1,7 @@
 ################
 # Test DataSet and Parameter classes
 
-from itmakescoffee.data.dataset import DataSet
+from itanalyses.data.dataset import DataSet
 
 
 ds = DataSet(csv_files=['C:\\Users\\User\\Documents\\temp\\29-07-2020\\0\\IV_Curve_0.csv',
@@ -40,9 +40,9 @@ ds.fill_factor.set_avg_fit(include=[True, True, True])
 import datetime
 import os
 
-from itmakescoffee.data.files.convert_files import convert_imc
-from itmakescoffee.data.files.save_info import save_info
-from itmakescoffee.utility import folders
+from itanalyses.data.files.convert_files import convert_imc
+from itanalyses.data.files.save_info import save_info
+from itanalyses.utility import folders
 
 folder_path = 'C:\\Users\\User\\Documents\\temp\\29-07-2020\\0'
 n_files = folders.get_number_of_csv(path=folder_path)[0]
@@ -64,9 +64,9 @@ for i in range(n_files):
 import datetime
 import os
 
-from itmakescoffee.data.files.convert_files import convert_kickstart
-from itmakescoffee.data.files.save_info import save_info
-from itmakescoffee.utility import folders
+from itanalyses.data.files.convert_files import convert_kickstart
+from itanalyses.data.files.save_info import save_info
+from itanalyses.utility import folders
 
 folder_path = 'C:\\Users\\User\\Documents\\temp\\PV'
 file_paths = folders.get_kickstart_paths(path=folder_path)
@@ -93,7 +93,7 @@ for i, file in enumerate(file_paths):
 
 ####################
 # Test DataIndex creation
-from itmakescoffee.data.dataindex import DataIndex
+from itanalyses.data.dataindex import DataIndex
 
 folder = 'C:\\Users\\User\\Documents\\temp'
 data_index = DataIndex(folder=folder)
@@ -105,7 +105,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import optimize
 
-from itmakescoffee.data.trace import Trace
+from itanalyses.data.trace import Trace
 
 mytrace = Trace(data_path='C:\\Users\\User\\Documents\\temp\\29-07-2020\\0\\IV_Curve_0.csv')
 
