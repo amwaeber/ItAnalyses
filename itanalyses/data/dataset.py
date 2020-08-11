@@ -62,4 +62,3 @@ class DataSet:
                      "Irradiance 4 (W/m2)"]:
             df[item] = 0
         return df
-

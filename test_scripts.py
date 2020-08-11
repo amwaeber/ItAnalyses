@@ -49,10 +49,11 @@ n_files = folders.get_number_of_csv(path=folder_path)[0]
 for i in range(n_files):
     convert_imc(file_path=os.path.join(folder_path, 'IV_Curve_%d.csv' % i),
                 save_file=os.path.join(folder_path, 'IV_CurveA_%d.csv' % i))
-    save_info(file_path=os.path.join(folder_path, 'IV_CurveA_%d.dat' % i),
+    save_info(folder=folder_path,
+              file_path=os.path.join(folder_path, 'IV_CurveA_%d.dat' % i),
               experiment_name=os.path.basename(folder_path),
               experiment_date=datetime.datetime.fromtimestamp(os.path.getctime(
-                  os.path.join(folder_path, 'IV_Curve_%d.csv' % i))).date(),
+                  os.path.join(folder_path, 'IV_Curve_%d.csv' % i))).date(),  # Gives the wrong date...
               pv_cell_id='unknown',
               pv_cell_type='mc-Si',
               setup_location='Vinery Way'
@@ -74,7 +75,8 @@ file_paths.sort()
 for i, file in enumerate(file_paths):
     convert_kickstart(file_path=os.path.join(folder_path, file),
                       save_file=os.path.join(folder_path, 'IV_Curve_%d.csv' % i))
-    save_info(file_path=os.path.join(folder_path, 'IV_Curve_%d.dat' % i),
+    save_info(folder=folder_path,
+              file_path=os.path.join(folder_path, 'IV_Curve_%d.dat' % i),
               experiment_name=os.path.basename(folder_path),
               experiment_date=file.split(' ')[-1].split('T')[0],
               film_id='None',

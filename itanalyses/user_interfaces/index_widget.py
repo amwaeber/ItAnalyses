@@ -39,7 +39,7 @@ class IndexWidget(QtWidgets.QDialog):
         self.experiment_tree.setRootIsDecorated(False)
         self.experiment_tree.setSortingEnabled(True)
         self.experiment_tree.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        header_labels = [''] + list(self.data_index.info.info.keys())
+        header_labels = [''] + list(self.data_index.info.info.keys())[1:]
         self.experiment_tree.setHeaderLabels(header_labels)
         self.experiment_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         vbox_total.addWidget(self.experiment_tree)
@@ -80,7 +80,7 @@ class IndexWidget(QtWidgets.QDialog):
         self.experiment_tree.clear()
         for i, file in enumerate(self.data_index.files):
             tree_item = TreeWidgetItem(ItemSignal(), self.experiment_tree,
-                                       [None] + ['%s' % _ for _ in self.data_index.info.info.loc[i].values.tolist()])
+                                       [None] + ['%s' % _ for _ in self.data_index.info.info.loc[i].values.tolist()[1:]])
             tree_item.setToolTip(1, os.path.dirname(file))
             tree_item.setCheckState(0, Qt.Unchecked)
             tree_item.signal.itemChecked.connect(self.tree_checkbox_changed)
