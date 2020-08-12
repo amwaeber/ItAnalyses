@@ -8,6 +8,7 @@ from itanalyses.utility import plots
 from itanalyses.utility import colors
 from itanalyses.utility.conversions import timestamp_to_datetime_hour, metric_prefix
 from itanalyses.data.group import Group
+from itanalyses.data.dataindex import DataIndex
 from itanalyses.data.experiment import Experiment
 from itanalyses.utility.widgets import TreeWidgetItem, ItemSignal
 from itanalyses.user_interfaces.index_widget import IndexWidget
@@ -54,6 +55,8 @@ class MainWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(MainWidget, self).__init__(parent)
+
+        self.data_index = DataIndex()
 
         self.experiment_paths = list()
         self.experiment_dict = {}
@@ -468,10 +471,10 @@ class MainWidget(QtWidgets.QWidget):
         self.update_plot()
 
     def show_index(self):
-        index_dialog = IndexWidget(self)
+        index_dialog = IndexWidget(self, data_index=self.data_index, selected=self.experiment_paths)
         if index_dialog.exec_():
             self.experiment_paths = index_dialog.selected
-            print(self.experiment_paths)
+            self.data_index = index_dialog.data_index
         else:
             pass
 
