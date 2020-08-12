@@ -19,17 +19,17 @@ class Info:
         self.files = list()
 
         if setting_files:
-            self.files = setting_files
-            self.load_data()
+            self.load_data(files=setting_files)
         elif index_file:
             self.load_data(index_file=index_file)
 
-    def load_data(self, index_file=None):
+    def load_data(self, files=None, index_file=None):
         if index_file:
             self.info = pd.read_csv(index_file, index_col=0)
-            self.files = self.info['folder'].values.tolist()
+            self.files = [os.path.join(folder, 'IV_Curve_0.dat') for folder in self.info['folder'].values.tolist()]
         else:
-            for file in self.files:
+            self.files += files
+            for file in files:
                 df = pd.read_csv(file)
                 idx = len(self.info.index)
                 for i, values in enumerate(df.values.tolist()):
