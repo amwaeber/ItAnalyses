@@ -7,7 +7,8 @@ class DataIndex:
     def __init__(self, folder=None, index_file=None):
         if index_file:
             self.folder = os.path.dirname(index_file)
-            self.load(index_file=index_file)
+            self.info = Info(index_file=index_file)
+            self.files = self.info.files
         else:
             self.folder = folder if folder is not None else '.'
             self.files = self.file_names(self.folder)
@@ -26,8 +27,5 @@ class DataIndex:
                 files += self.file_names(new_path)
         return files
 
-    def load(self, index_file=None):
-        pass
-
-    def save(self, index_file=None):
-        pass
+    def save(self, index_file='index.idx'):
+        self.info.save_data(file_path=index_file)

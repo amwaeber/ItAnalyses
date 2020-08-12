@@ -1,4 +1,5 @@
 import datetime
+import os
 import pandas as pd
 
 
@@ -12,18 +13,27 @@ info_pars = {'folder': ['.'], 'experiment_name': ['N/A'], 'experiment_date': [da
 
 
 class Info:
-    def __init__(self, setting_files=None):
-        self.files = list() if setting_files is None else setting_files
+    def __init__(self, setting_files=None, index_file=None):
+
         self.info = pd.DataFrame(columns=list(info_pars.keys()))
+        self.files = list()
 
-        self.load_data()
+        if setting_files:
+            self.files = setting_files
+            self.load_data()
+        elif index_file:
+            self.load_data(index_file=index_file)
 
-    def load_data(self):
-        for file in self.files:
-            df = pd.read_csv(file)
-            idx = len(self.info.index)
-            for i, values in enumerate(df.values.tolist()):
-                self.info.loc[idx + i] = values[1:]
+    def load_data(self, index_file=None):
+        if index_file:
+            self.info = pd.read_csv(index_file, index_col=0)
+            self.files = self.info['folder'].values.tolist()
+        else:
+            for file in self.files:
+                df = pd.read_csv(file)
+                idx = len(self.info.index)
+                for i, values in enumerate(df.values.tolist()):
+                    self.info.loc[idx + i] = [os.path.dirname(file)] + values[2:]
 
-    def save_data(self, file_path='.'):
+    def save_data(self, file_path='info.dat'):
         self.info.to_csv(file_path)

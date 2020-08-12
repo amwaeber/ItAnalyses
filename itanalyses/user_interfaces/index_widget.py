@@ -61,17 +61,17 @@ class IndexWidget(QtWidgets.QDialog):
 
     def open_index(self):  # TODO: Implement loading from saved index
         index = str(QtWidgets.QFileDialog.getOpenFileName(self, 'Select Directory', self.index_path,
-                                                          "Index files (*.idx)"))
+                                                          "Index files (*.idx)")[0])
         if index:
             self.index_path = os.path.dirname(index)
-            self.data_index = DataIndex(index_file=self.index_path)
+            self.data_index = DataIndex(index_file=index)
             self.update_index_tree()
 
     def refresh_index(self):
         self.data_index = DataIndex(folder=self.data_index.folder)
         self.update_index_tree()
 
-    def save_index(self):  # TODO: Implement saving existing index
+    def save_index(self):
         save_path = str(QtWidgets.QFileDialog.getSaveFileName(self, 'Save as...', self.index_path,
                                                               "Index files (*.idx)")[0])
         self.data_index.save(save_path)
