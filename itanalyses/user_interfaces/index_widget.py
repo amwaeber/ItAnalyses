@@ -47,14 +47,14 @@ class IndexWidget(QtWidgets.QDialog):
         self.toolbar.addAction(save_button)
         vbox_total.addWidget(self.toolbar)
 
-        self.experiment_tree = QtWidgets.QTreeWidget()
-        self.experiment_tree.setRootIsDecorated(False)
-        self.experiment_tree.setSortingEnabled(True)
-        self.experiment_tree.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.index_tree = QtWidgets.QTreeWidget()
+        self.index_tree.setRootIsDecorated(False)
+        self.index_tree.setSortingEnabled(True)
+        self.index_tree.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         header_labels = [''] + list(self.data_index.info.info.keys())[1:]
-        self.experiment_tree.setHeaderLabels(header_labels)
-        self.experiment_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        vbox_total.addWidget(self.experiment_tree)
+        self.index_tree.setHeaderLabels(header_labels)
+        self.index_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        vbox_total.addWidget(self.index_tree)
 
         self.buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         self.buttonBox.accepted.connect(self.accept)
@@ -82,7 +82,7 @@ class IndexWidget(QtWidgets.QDialog):
             self.update_index_tree()
 
     def remove_from_index(self):
-        folders = [item.toolTip(1) for item in self.experiment_tree.selectedItems()]
+        folders = [item.toolTip(1) for item in self.index_tree.selectedItems()]
         self.data_index.remove(files=[os.path.join(folder, 'IV_Curve_0.dat') for folder in folders])
         self.selected = list(set(self.selected) - set(folders))
         self.update_index_tree()
@@ -94,25 +94,23 @@ class IndexWidget(QtWidgets.QDialog):
         self.index_path = os.path.dirname(save_path)
 
     def select(self):
-        folders = [item.toolTip(1) for item in self.experiment_tree.selectedItems()]
-        # self.selected = list(set(self.selected))
-        for idx in range(self.experiment_tree.topLevelItemCount()):
-            item = self.experiment_tree.topLevelItem(idx)
+        folders = [item.toolTip(1) for item in self.index_tree.selectedItems()]
+        for idx in range(self.index_tree.topLevelItemCount()):
+            item = self.index_tree.topLevelItem(idx)
             if item.toolTip(1) in folders:
                 item.setCheckState(0, Qt.Checked)
 
     def unselect(self):
-        folders = [item.toolTip(1) for item in self.experiment_tree.selectedItems()]
-        self.selected = list(set(self.selected) - set(folders))
-        for idx in range(self.experiment_tree.topLevelItemCount()):
-            item = self.experiment_tree.topLevelItem(idx)
+        folders = [item.toolTip(1) for item in self.index_tree.selectedItems()]
+        for idx in range(self.index_tree.topLevelItemCount()):
+            item = self.index_tree.topLevelItem(idx)
             if item.toolTip(1) in folders:
                 item.setCheckState(0, Qt.Unchecked)
 
     def update_index_tree(self):
-        self.experiment_tree.clear()
+        self.index_tree.clear()
         for i, file in enumerate(self.data_index.files):
-            tree_item = TreeWidgetItem(ItemSignal(), self.experiment_tree,
+            tree_item = TreeWidgetItem(ItemSignal(), self.index_tree,
                                        [None] + ['%s' % _ for _ in
                                                  self.data_index.info.info.loc[i].values.tolist()[1:]])
             tree_item.setToolTip(1, os.path.dirname(file))

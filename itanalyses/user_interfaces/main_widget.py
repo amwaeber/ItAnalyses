@@ -9,6 +9,7 @@ from itanalyses.utility import colors
 from itanalyses.utility.conversions import timestamp_to_datetime_hour, metric_prefix
 from itanalyses.data.group import Group
 from itanalyses.data.dataindex import DataIndex
+from itanalyses.data.dataset import DataSet
 from itanalyses.data.experiment import Experiment
 from itanalyses.utility.widgets import TreeWidgetItem, ItemSignal
 from itanalyses.user_interfaces.index_widget import IndexWidget
@@ -58,7 +59,7 @@ class MainWidget(QtWidgets.QWidget):
 
         self.data_index = DataIndex()
 
-        self.experiment_paths = list()
+        self.dataset_paths = list()
         self.experiment_dict = {}
         self.reference_experiment = ''
 
@@ -115,6 +116,9 @@ class MainWidget(QtWidgets.QWidget):
         hbox_total.addLayout(vbox_left, 5)
 
         vbox_right = QtWidgets.QVBoxLayout()
+        self.tabs = QtWidgets.QTabWidget()
+        self.tabs.setTabShape(QtWidgets.QTabWidget.Triangular)
+        self.tabs.setTabPosition(QtWidgets.QTabWidget.West)
         self.plot_settings_group_box = QtWidgets.QGroupBox('Plot Settings')
         vbox_plot_set = QtWidgets.QVBoxLayout()
         hbox_plot_set1 = QtWidgets.QHBoxLayout()
@@ -398,7 +402,7 @@ class MainWidget(QtWidgets.QWidget):
         hbox_plot_set2.addWidget(self.clipboard_button)
         vbox_plot_set.addLayout(hbox_plot_set2)
         self.plot_settings_group_box.setLayout(vbox_plot_set)
-        vbox_right.addWidget(self.plot_settings_group_box)
+        self.tabs.addTab(self.plot_settings_group_box, 'Options')
 
         self.export_group_box = QtWidgets.QGroupBox('Data Export')
         hbox_data_export = QtWidgets.QHBoxLayout()
@@ -412,7 +416,7 @@ class MainWidget(QtWidgets.QWidget):
         self.export_folder_edit.setDisabled(True)
         hbox_data_export.addWidget(self.export_folder_edit)
         self.export_group_box.setLayout(hbox_data_export)
-        vbox_right.addWidget(self.export_group_box)
+        self.tabs.addTab(self.export_group_box, 'Export')
 
         self.analysis_group_box = QtWidgets.QGroupBox('Experiment data')
         vbox_analysis = QtWidgets.QVBoxLayout()
@@ -454,29 +458,57 @@ class MainWidget(QtWidgets.QWidget):
         hbox_analysis.addWidget(self.analysis_group_button)
         hbox_analysis.addStretch(-1)
         vbox_analysis.addLayout(hbox_analysis)
-        self.experiment_tree = QtWidgets.QTreeWidget()
-        self.experiment_tree.setRootIsDecorated(False)
-        self.experiment_tree.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.experiment_tree.setHeaderLabels(["Ref", "Plot", "Experiment", "Traces", "Film Th.", "Film Area",
-                                              "Created"])
-        self.experiment_tree.setSortingEnabled(True)
-        self.experiment_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        self.experiment_tree.header().sectionClicked.connect(lambda: self.change_order('header'))
-        vbox_analysis.addWidget(self.experiment_tree)
+
+        self.data_tree = QtWidgets.QTreeWidget()
+        self.data_tree.setRootIsDecorated(False)
+        self.data_tree.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.data_tree.setHeaderLabels(['Plot', 'Name', 'Date', 'Time', 'Isc', 'Voc', 'Pmax', 'FF', 'Tavg', 'Iavg'])
+        self.data_tree.setSortingEnabled(True)
+        self.data_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.data_tree.header().sectionClicked.connect(lambda: self.change_order('header'))
+        vbox_analysis.addWidget(self.data_tree)
         self.analysis_group_box.setLayout(vbox_analysis)
-        vbox_right.addWidget(self.analysis_group_box)
+        self.tabs.addTab(self.analysis_group_box, 'Data')
+        vbox_right.addWidget(self.tabs)
         hbox_total.addLayout(vbox_right, 3)
         self.setLayout(hbox_total)
 
         self.update_plot()
 
     def show_index(self):
-        index_dialog = IndexWidget(self, data_index=self.data_index, selected=self.experiment_paths)
+        index_dialog = IndexWidget(self, data_index=self.data_index, selected=self.dataset_paths.copy())
         if index_dialog.exec_():
-            self.experiment_paths = index_dialog.selected
+            delete_paths = list(set(self.dataset_paths) - set(index_dialog.selected))
+            add_paths = list(set(index_dialog.selected) - set(self.dataset_paths))
+            self.dataset_paths = index_dialog.selected.copy()
             self.data_index = index_dialog.data_index
+            self.update_datasets(delete_paths=delete_paths, add_paths=add_paths)
+            self.update_data_tree(delete_keys=delete_paths, add_keys=add_paths)
         else:
             pass
+
+    def update_datasets(self, delete_paths=None, add_paths=None):
+        for path in delete_paths or []:
+            self.experiment_dict.pop(path, None)
+        for path in add_paths or []:
+            self.experiment_dict[path] = DataSet(folder=path)
+
+    def update_data_tree(self, delete_keys=None, add_keys=None):
+        for path in delete_keys or []:
+            for idx in reversed(range(self.data_tree.topLevelItemCount())):  # indices shift after deleting item
+                item = self.data_tree.topLevelItem(idx)
+                if item.toolTip(1) == path:
+                    item.setCheckState(0, Qt.Unchecked)
+                    (item.parent() or self.data_tree.invisibleRootItem()).removeChild(item)
+        for path in add_keys or []:
+            tree_item = TreeWidgetItem(ItemSignal(), self.data_tree,
+                                       [None, str(path), 'bla',
+                                        str(self.experiment_dict[path].info.info['experiment_name'][0]),
+                                        str(self.experiment_dict[path].info.info['experiment_date'][0]),
+                                        None, None, None, None, None, None, None])
+            tree_item.setToolTip(1, path)
+            tree_item.setCheckState(0, Qt.Unchecked)
+            tree_item.signal.itemChecked.connect(self.tree_checkbox_changed)
 
     def folder_dialog(self):
         self.plot_directory = str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Directory',
@@ -488,20 +520,20 @@ class MainWidget(QtWidgets.QWidget):
         multi_dir_dialog.setDirectory(self.analysis_directory)
         multi_dir_dialog.show()
         multi_dir_dialog.exec_()
-        self.experiment_paths.extend(get_experiment_folders(multi_dir_dialog.selectedFiles()))
-        self.analysis_directory = self.experiment_paths[-1] if len(self.experiment_paths) > 0 \
+        self.dataset_paths.extend(get_experiment_folders(multi_dir_dialog.selectedFiles()))
+        self.analysis_directory = self.dataset_paths[-1] if len(self.dataset_paths) > 0 \
             else self.analysis_directory
-        self.experiment_paths.extend(get_group_file_paths(multi_dir_dialog.selectedFiles()))
-        self.experiment_paths = list(set(self.experiment_paths))
+        self.dataset_paths.extend(get_group_file_paths(multi_dir_dialog.selectedFiles()))
+        self.dataset_paths = list(set(self.dataset_paths))
         self.update_experiment_data()
         self.update_experiment_tree()
         if self.reference_experiment:
             self.update_reference()  # apply reference to new experiments too
 
     def remove_experiments(self):
-        for item in self.experiment_tree.selectedItems():
+        for item in self.data_tree.selectedItems():
             experiment = item.toolTip(2)
-            self.experiment_paths.remove(experiment)
+            self.dataset_paths.remove(experiment)
             try:
                 self.plot_list.remove(experiment)
             except ValueError:
@@ -514,7 +546,7 @@ class MainWidget(QtWidgets.QWidget):
 
     def group_experiments(self):
         group_list = list()
-        for item in self.experiment_tree.selectedItems():
+        for item in self.data_tree.selectedItems():
             experiment = self.experiment_dict[item.toolTip(2)]
             for trace in experiment.traces.values():
                 if trace.is_included:
@@ -537,12 +569,12 @@ class MainWidget(QtWidgets.QWidget):
             group_filepath = os.path.join(group_filepath, '.gpkl')
         group = Group(group_filepath, traces)
         group.save_pickle()
-        self.experiment_paths.append(group.file_path)
+        self.dataset_paths.append(group.file_path)
         self.update_experiment_data()
         self.update_experiment_tree()
 
     def change_selection(self, select):
-        iterator = QtWidgets.QTreeWidgetItemIterator(self.experiment_tree)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.data_tree)
         modifiers = QtWidgets.QApplication.keyboardModifiers()
         while iterator.value():
             tree_item = iterator.value()
@@ -562,32 +594,32 @@ class MainWidget(QtWidgets.QWidget):
 
     def change_order(self, origin=None):
         if origin == 'header':
-            self.experiment_paths = []
-            iterator = QtWidgets.QTreeWidgetItemIterator(self.experiment_tree)
+            self.dataset_paths = []
+            iterator = QtWidgets.QTreeWidgetItemIterator(self.data_tree)
             while iterator.value():
                 tree_item = iterator.value()
-                self.experiment_paths.append(str(tree_item.toolTip(2)))
+                self.dataset_paths.append(str(tree_item.toolTip(2)))
                 iterator += 1
-        elif len(self.experiment_tree.selectedItems()) == 1:
-            self.experiment_tree.header().setSortIndicator(-1, Qt.AscendingOrder)
-            item = self.experiment_tree.selectedItems()[0]
-            row = self.experiment_tree.selectedIndexes()[0].row()
+        elif len(self.data_tree.selectedItems()) == 1:
+            self.data_tree.header().setSortIndicator(-1, Qt.AscendingOrder)
+            item = self.data_tree.selectedItems()[0]
+            row = self.data_tree.selectedIndexes()[0].row()
             if origin == 'up' and row > 0:
-                self.experiment_tree.takeTopLevelItem(row)
-                self.experiment_tree.insertTopLevelItem(row - 1, item)
-                self.experiment_tree.setCurrentItem(item)
-                self.experiment_paths.insert(row - 1, self.experiment_paths.pop(row))
-            elif origin == 'down' and row < len(self.experiment_paths) - 1:
-                self.experiment_tree.takeTopLevelItem(row)
-                self.experiment_tree.insertTopLevelItem(row + 1, item)
-                self.experiment_tree.setCurrentItem(item)
-                self.experiment_paths.insert(row + 1, self.experiment_paths.pop(row))
+                self.data_tree.takeTopLevelItem(row)
+                self.data_tree.insertTopLevelItem(row - 1, item)
+                self.data_tree.setCurrentItem(item)
+                self.dataset_paths.insert(row - 1, self.dataset_paths.pop(row))
+            elif origin == 'down' and row < len(self.dataset_paths) - 1:
+                self.data_tree.takeTopLevelItem(row)
+                self.data_tree.insertTopLevelItem(row + 1, item)
+                self.data_tree.setCurrentItem(item)
+                self.dataset_paths.insert(row + 1, self.dataset_paths.pop(row))
         self.update_plot()
 
     def update_experiment_tree(self):
-        self.experiment_tree.clear()
-        for path in self.experiment_paths:
-            tree_item = TreeWidgetItem(ItemSignal(), self.experiment_tree,
+        self.data_tree.clear()
+        for path in self.dataset_paths:
+            tree_item = TreeWidgetItem(ItemSignal(), self.data_tree,
                                        [None, None, self.experiment_dict[path].name,
                                         str(sum(self.experiment_dict[path].n_traces)),
                                         str(self.experiment_dict[path].film_thickness),
@@ -599,56 +631,53 @@ class MainWidget(QtWidgets.QWidget):
             tree_item.signal.itemChecked.connect(self.tree_checkbox_changed)
 
     def update_experiment_data(self):
-        for path in self.experiment_paths:
+        for path in self.dataset_paths:
             if path not in self.experiment_dict.keys() and path.endswith('.gpkl'):
                 self.experiment_dict[path] = Group(path)
             elif path not in self.experiment_dict.keys():
                 self.experiment_dict[path] = Experiment(path)
         for path in list(self.experiment_dict.keys()):
-            if path not in self.experiment_paths:
+            if path not in self.dataset_paths:
                 self.experiment_dict[path].save_pickle()  # save analysed data in pickle
                 self.experiment_dict.pop(path, None)
 
     @QtCore.pyqtSlot(object, int)
     def tree_checkbox_changed(self, item, column):
-        experiment = str(item.toolTip(2))
-        if column == 0:  # Reference
-            if int(item.checkState(column)) == 0:
-                self.experiment_dict[experiment].is_reference = False
-                if self.reference_experiment == experiment:
-                    self.reference_experiment = ''
-            else:
-                self.experiment_dict[experiment].is_reference = True
-                self.reference_experiment = experiment
-                # set other reference cbs to False so only one reference at any time
-                iterator = QtWidgets.QTreeWidgetItemIterator(self.experiment_tree)
-                while iterator.value():
-                    tree_item = iterator.value()
-                    if tree_item != item and int(tree_item.checkState(column)) != 0:
-                        tree_item.setCheckState(0, Qt.Unchecked)
-                        self.experiment_dict[str(tree_item.toolTip(2))].is_reference = False
-                    iterator += 1
-            self.update_reference()
-            self.update_plot()  # to update effects reference switch has on plot
+        experiment = str(item.toolTip(1))
+        # if column == 0:  # Reference
+        #     if int(item.checkState(column)) == 0:
+        #         self.experiment_dict[experiment].is_reference = False
+        #         if self.reference_experiment == experiment:
+        #             self.reference_experiment = ''
+        #     else:
+        #         self.experiment_dict[experiment].is_reference = True
+        #         self.reference_experiment = experiment
+        #         # set other reference cbs to False so only one reference at any time
+        #         iterator = QtWidgets.QTreeWidgetItemIterator(self.data_tree)
+        #         while iterator.value():
+        #             tree_item = iterator.value()
+        #             if tree_item != item and int(tree_item.checkState(column)) != 0:
+        #                 tree_item.setCheckState(0, Qt.Unchecked)
+        #                 self.experiment_dict[str(tree_item.toolTip(2))].is_reference = False
+        #             iterator += 1
+        #     self.update_reference()
+        #     self.update_plot()  # to update effects reference switch has on plot
 
-        elif column == 1:  # Plot
-            if int(item.checkState(column)) == 0:
-                self.experiment_dict[experiment].is_plotted = False
+        if column == 0:  # Plot
+            if int(item.checkState(column)) == 0 and experiment in self.plot_list:
                 self.plot_list.remove(experiment)
-            else:
+            elif int(item.checkState(column)) != 0 and experiment not in self.plot_list:
                 # set other plot cbs to False if in single-plot mode
                 if self.plot_mode == 'Single':
-                    iterator = QtWidgets.QTreeWidgetItemIterator(self.experiment_tree)
+                    iterator = QtWidgets.QTreeWidgetItemIterator(self.data_tree)
                     while iterator.value():
                         tree_item = iterator.value()
                         if tree_item != item and int(tree_item.checkState(column)) != 0:
-                            tree_item.setCheckState(1, Qt.Unchecked)
-                            self.experiment_dict[str(tree_item.toolTip(2))].is_reference = False
+                            tree_item.setCheckState(0, Qt.Unchecked)
                         iterator += 1
-                self.experiment_dict[experiment].is_plotted = True
                 self.plot_list.append(experiment)
-            self.update_plot()
-            self.update_trace_tree()
+            # self.update_plot()
+            # self.update_trace_tree()
 
     def update_reference(self):
         for experiment in self.experiment_dict.values():

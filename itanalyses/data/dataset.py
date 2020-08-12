@@ -14,10 +14,14 @@ from itanalyses.data.parameters.parameter_group import ParameterGroup
 
 
 class DataSet:
-    def __init__(self, name='Dataset', csv_files=None, *args, **kwargs):
-        self.name = name
-
-        self.file_paths = list() if csv_files is None else csv_files
+    def __init__(self, **kwargs):
+        self.file_paths = list()
+        if 'folder' in kwargs:
+            self.file_paths += self.get_files(kwargs.get('folder'))
+        if 'csv_files' in kwargs:
+            self.file_paths += kwargs.get('csv_files')
+        self.file_paths = list(set(self.file_paths))
+        self.file_paths.sort()
         self.info = Info(setting_files=[file[:-4] + '.dat' for file in self.file_paths])
         self.data = self.load_data()
 
@@ -34,6 +38,8 @@ class DataSet:
         self.irradiance4 = Irradiance(data_frames=[df['Irradiance 4 (W/m2)'] for df in self.data])
         self.par_group = ParameterGroup()
 
+        self.set_values()
+
     def new_par_group(self, parameters=None, labels=None):
         self.par_group = ParameterGroup(parameters=parameters, labels=labels)
 
@@ -41,24 +47,36 @@ class DataSet:
         self.time = Time(data_frames=[df['Time (s)'] for df in self.data], from_zero=from_zero)
 
     def load_data(self):
-        data = list()
-        for path in self.file_paths:
-            if os.path.basename(path).startswith('IV_Curve_'):  # ItMakesCoffee data
-                data.append(pd.read_csv(path, header=0, index_col=0))
-            # else:
-            #     data.append(self.load_kickstart_data(path))  # Kickstart data
+        data = [pd.read_csv(path, header=0, index_col=0) for path in self.file_paths]
         return data
 
+    def set_values(self):
+        self.current.set_value(voltage=self.voltage)
+        self.voltage.set_value(current=self.current)
+        self.power.set_value(current=self.current)
+        self.fill_factor.set_value(voltage=self.voltage, current=self.current, power=self.power)
+        self.time.set_value()
+        self.temperature.set_value()
+        self.irradiance1.set_value()
+        self.irradiance2.set_value()
+        self.irradiance2.set_value()
+        self.irradiance3.set_value()
+
+    def set_averages(self, **kwargs):
+        include = kwargs.get('include', [True for _ in self.file_paths])
+        self.current.set_avg_value(include=include)
+        self.voltage.set_avg_value(include=include)
+        self.power.set_avg_value(include=include)
+        self.fill_factor.set_avg_value(include=include)
+        self.time.set_avg_value(include=include)
+        self.temperature.set_avg_value(include=include)
+        self.irradiance1.set_avg_value(include=include)
+        self.irradiance2.set_avg_value(include=include)
+        self.irradiance2.set_avg_value(include=include)
+        self.irradiance3.set_avg_value(include=include)
+
     @staticmethod
-    def load_kickstart_data(path):
-        df = pd.read_csv(path, sep=',', header=0, index_col=0, skiprows=33,
-                         names=["Time (s)", "Voltage (V)", "Current (A)"])
-        exp_time = time.mktime(time.strptime(os.path.basename(path).split(' ')[-1], "%Y-%m-%dT%H.%M.%S.csv"))
-        df.index.name = 'Index'
-        df['Time (s)'] = df['Time (s)'] + exp_time
-        df['Current (A)'] = - df['Current (A)']
-        df['Power (W)'] = df['Voltage (V)'] * df['Current (A)']
-        for item in ["Temperature (C)", "Irradiance 1 (W/m2)", "Irradiance 2 (W/m2)", "Irradiance 3 (W/m2)",
-                     "Irradiance 4 (W/m2)"]:
-            df[item] = 0
-        return df
+    def get_files(folder):
+        files = [os.path.join(folder, f) for f in os.listdir(folder) if
+                 f.endswith('.csv') and os.path.basename(f).startswith('IV_Curve_')]
+        return files

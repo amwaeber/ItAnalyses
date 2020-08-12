@@ -36,8 +36,7 @@ class Info:
                     self.info.loc[idx + i] = [os.path.dirname(file)] + values[2:]
 
     def drop_data(self, files=None):
-        files = list() if files is None else files
-        for file in files:
+        for file in files or []:
             self.files.remove(file)
             self.info.drop(self.info[self.info['folder'] == os.path.dirname(file)].index, inplace=True)
             self.info.reset_index(drop=True, inplace=True)
