@@ -30,11 +30,12 @@ class DataIndex:
 
     def add(self, folder=None):
         new_files = list(set(self.file_names(folder)) - set(self.files))
-        self.files += new_files
         self.info.load_data(files=new_files)
+        self.files = self.info.files.copy()
 
     def remove(self, files=None):
-        pass
+        self.info.drop_data(files=files)
+        self.files = self.info.files.copy()
 
     def save(self, index_file='index.idx'):
         self.info.save_data(file_path=index_file)

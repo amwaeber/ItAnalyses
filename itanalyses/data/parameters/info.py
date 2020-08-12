@@ -35,5 +35,12 @@ class Info:
                 for i, values in enumerate(df.values.tolist()):
                     self.info.loc[idx + i] = [os.path.dirname(file)] + values[2:]
 
+    def drop_data(self, files=None):
+        files = list() if files is None else files
+        for file in files:
+            self.files.remove(file)
+            self.info.drop(self.info[self.info['folder'] == os.path.dirname(file)].index, inplace=True)
+            self.info.reset_index(drop=True, inplace=True)
+
     def save_data(self, file_path='info.dat'):
         self.info.to_csv(file_path)

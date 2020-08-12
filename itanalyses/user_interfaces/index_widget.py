@@ -79,7 +79,9 @@ class IndexWidget(QtWidgets.QDialog):
             self.update_index_tree()
 
     def remove_from_index(self):
-        pass
+        files = [os.path.join(item.toolTip(1), 'IV_Curve_0.dat') for item in self.experiment_tree.selectedItems()]
+        self.data_index.remove(files=files)
+        self.update_index_tree()
 
     def save_index(self):
         save_path = str(QtWidgets.QFileDialog.getSaveFileName(self, 'Save as...', self.index_path,
